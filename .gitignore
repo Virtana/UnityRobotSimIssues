@@ -1,0 +1,10 @@
+### Unity
+[Ll]ogs/
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Pp]ackages/
+[Bb]uild/
+[Bb]uilds/
+ShaderCache/
+Assets/AssetStoreTools*
