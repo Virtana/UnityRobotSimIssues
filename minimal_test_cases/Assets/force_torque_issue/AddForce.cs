@@ -6,25 +6,17 @@ public class AddForce : MonoBehaviour
 {
     public float forceStrength;
     public float RayDistance;
-
-    // empty child object of Magnet - used to set the raycast begin point in world
-    private Transform _tipTransform;
+    public bool DebugMode;
+    
+    private Transform _tipTransform; // empty child object of Magnet - used to set the raycast begin point in world
+    private Vector3 _startPosition; // initial position of magnet in the scene
+    private float stride; // distance moved by magnet 
     
     void Start()
     {
-        // set force strength
-        if (forceStrength <= 0)
-        {
-            forceStrength = 5;
-            Debug.Log("Set defualt force: " + forceStrength);
-        }
-
-        // set ray cast distance (max distance at which the code will check for a collision with rigidbody)
-        if(RayDistance <= 0)
-        {
-            RayDistance = 1f;
-            Debug.Log("Set defualt ray distance: " + RayDistance);
-        }
+        stride = 0.05f;
+        DebugMode = false;
+        _startPosition = transform.position;
 
         // get tip transform
         _tipTransform = gameObject.transform.Find("Tip");
@@ -36,6 +28,9 @@ public class AddForce : MonoBehaviour
 
     void FixedUpdate()
     {
+        // sinusoidal translation in magnet's z axis
+        transform.position = _startPosition + stride*(new Vector3(0.0f, 0.0f, Mathf.Sin(Time.time)));
+        
         // setup raycast
         Vector3 rayBeginInTip = Vector3.zero;
         Vector3 rayBeginInWorld = _tipTransform.TransformPoint(rayBeginInTip);
@@ -43,17 +38,28 @@ public class AddForce : MonoBehaviour
 
         // cast ray out from tip frame
         RaycastHit raycastHitInfo;
-        bool hit = Physics.Raycast(rayBeginInWorld, rayDirectionInWorld, out raycastHitInfo, RayDistance);
-        Debug.DrawRay(rayBeginInWorld, rayDirectionInWorld * RayDistance, Color.green, 1f, false);
+        if(Physics.Raycast(rayBeginInWorld, rayDirectionInWorld, out raycastHitInfo, RayDistance))
+        {
+            if (DebugMode)
+            {
+                Debug.DrawRay(rayBeginInWorld, rayDirectionInWorld * RayDistance, Color.green, 1f, false);
+            }
 
-        // get hit info
-        Vector3 hitPointInWorld = raycastHitInfo.point;
-        Rigidbody hitObject = raycastHitInfo.rigidbody;
+            // get hit info
+            Vector3 hitPointInWorld = raycastHitInfo.point;
+            Rigidbody hitObject = raycastHitInfo.rigidbody;
+            if(hitObject != null)
+            {
+                // apply force at hit point in direction of tip
+                Vector3 force = -rayDirectionInWorld.normalized * forceStrength;
+                hitObject.AddForceAtPosition(force, hitPointInWorld);
 
-        // apply force at hit point in direction of tip
-        Vector3 force = -rayDirectionInWorld.normalized * forceStrength;
-        hitObject.AddForceAtPosition(force, hitPointInWorld);
-        Debug.DrawRay(hitPointInWorld, force, Color.blue, 1f, false);       
+                if (DebugMode)
+                {
+                    Debug.DrawRay(hitPointInWorld, force, Color.blue, 1f, false);
+                }
+            }
+        } 
     }
 }
 
