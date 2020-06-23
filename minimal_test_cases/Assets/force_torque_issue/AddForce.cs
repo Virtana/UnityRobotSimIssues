@@ -7,7 +7,8 @@ public class AddForce : MonoBehaviour
     public float forceStrength;
     public float RayDistance;
     public bool DebugMode;
-    
+    public bool Manual;
+
     private Transform _tipTransform; // empty child object of Magnet - used to set the raycast begin point in world
     private Vector3 _startPosition; // initial position of magnet in the scene
     private float stride; // distance moved by magnet 
@@ -28,8 +29,11 @@ public class AddForce : MonoBehaviour
 
     void FixedUpdate()
     {
-        // sinusoidal translation in magnet's z axis
-        transform.position = _startPosition + stride*(new Vector3(0.0f, 0.0f, Mathf.Sin(Time.time)));
+        if (!Manual)
+        {
+            // sinusoidal translation in magnet's z axis
+            transform.position = _startPosition + stride * (new Vector3(0.0f, 0.0f, Mathf.Sin(Time.time)));
+        }
         
         // setup raycast
         Vector3 rayBeginInTip = Vector3.zero;
