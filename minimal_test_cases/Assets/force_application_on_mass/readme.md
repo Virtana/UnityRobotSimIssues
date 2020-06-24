@@ -28,3 +28,4 @@ Our issue lies with the first and third objects. The first object should never f
 
 Physic Materials were applied to emulate a rubber suction cup and wooden block.
 
+Using the `Temporal Gauss Seidel` solver gives better results for `Object 1` but the expected behaviour is still not observed. 
